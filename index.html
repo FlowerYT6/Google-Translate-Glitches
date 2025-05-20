@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Google Translate Glitch Tester</title>
+  <style>
+    body { font-family: Arial, sans-serif; max-width: 600px; margin: 20px auto; padding: 0 15px; }
+    h1 { text-align: center; }
+    pre { background: #222; color: #0f0; padding: 10px; border-radius: 5px; overflow-x: auto; }
+    .test-case { margin-bottom: 30px; }
+    button { padding: 8px 15px; font-size: 16px; cursor: pointer; }
+  </style>
+</head>
+<body>
+  <h1>Google Translate Glitch Tester</h1>
+  <button id="run-tests">Run Glitch Tests</button>
+  <div id="results"></div>
+
+  <script>
+    const testInputs = [
+      { text: 'goo dog doom doom doom ag ag ag ag doom dog ag', source: 'so', target: 'en' },
+      { text: 'do nal d tru mp do nal d tru mp do nal d tru mp', source: 'so', target: 'en' },
+      { text: 'ha ha ha ha ha ha ha ha ha ha ha ha ha', source: 'mi', target: 'en' },
+      { text: 'kag kag kag Jerusalem Jerusalem Jerusalem kag kag kag', source: 'so', target: 'en' },
+    ];
+
+    const resultsDiv = document.getElementById('results');
+    const runBtn = document.getElementById('run-tests');
+
+    async function translate(text, source, target) {
+      const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=${source}&tl=${target}&dt=t&q=${encodeURIComponent(text)}`;
+      try {
+        const res = await fetch(url);
+        const data = await res.json();
+        return data[0].map(item => item[0]).join('');
+      } catch (e) {
+        return `Error: ${e.message}`;
+      }
+    }
+
+    async function runTests() {
+      resultsDiv.innerHTML = '';
+      for (const input of testInputs) {
+        const container = document.createElement('div');
+        container.classList.add('test-case');
+        container.innerHTML = `<strong>Input:</strong> ${input.text} <br><strong>From:</strong> ${input.source} <br><strong>To:</strong> ${input.target} <br><strong>Output:</strong> <pre>Loading...</pre>`;
+        resultsDiv.appendChild(container);
+        const output = await translate(input.text, input.source, input.target);
+        container.querySelector('pre').textContent = output;
+      }
+    }
+
+    runBtn.addEventListener('click', runTests);
+  </script>
+</body>
+</html>
